@@ -1,0 +1,31 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Kreunt/phonerisk",
+  "title": "PhoneRisk",
+  "description": "Validate phone numbers and score their risk: line type, carrier, disposable-number detection.",
+  "version": "0.1.0",
+  "websiteUrl": "https://rapidapi.com/daimaileri20/api/phonerisk-api",
+  "repository": {
+    "url": "https://github.com/Kreunt/phonerisk",
+    "source": "github",
+    "subfolder": "mcp"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "phonerisk-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "RAPIDAPI_KEY",
+          "description": "Your RapidAPI key, from a subscription to the PhoneRisk API",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

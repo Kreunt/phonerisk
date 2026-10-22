@@ -1,0 +1,44 @@
+{
+  "name": "phonerisk-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for the PhoneRisk API: lets AI assistants validate phone numbers and score their risk.",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "phone",
+    "phone-number",
+    "phone-validation",
+    "risk-score",
+    "fraud",
+    "disposable-phone-number",
+    "rapidapi"
+  ],
+  "license": "MIT",
+  "author": "Kreunt",
+  "homepage": "https://github.com/Kreunt/phonerisk/tree/main/mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kreunt/phonerisk.git",
+    "directory": "mcp"
+  },
+  "bugs": "https://github.com/Kreunt/phonerisk/issues",
+  "mcpName": "io.github.Kreunt/phonerisk",
+  "type": "module",
+  "bin": {
+    "phonerisk-mcp": "server.js"
+  },
+  "files": [
+    "server.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.6"
+  }
+}

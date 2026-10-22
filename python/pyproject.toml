@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phonerisk"
+dynamic = ["version"]
+description = "Client for the PhoneRisk API: phone number validation, line type, carrier, disposable-number detection and a 0-100 risk score."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kreunt" }]
+keywords = [
+    "phone", "phone-number", "validation", "phone-validation", "risk-score", "fraud",
+    "disposable-phone-number", "line-type", "carrier", "sms", "libphonenumber", "rapidapi",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Communications :: Telephony",
+    "Typing :: Typed",
+]
+# The client uses the standard library only
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Kreunt/phonerisk"
+Documentation = "https://phonerisk.up.railway.app/docs"
+"API keys and plans" = "https://rapidapi.com/daimaileri20/api/phonerisk-api"
+Issues = "https://github.com/Kreunt/phonerisk/issues"
+
+[tool.setuptools.dynamic]
+version = { attr = "phonerisk.client.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+phonerisk = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

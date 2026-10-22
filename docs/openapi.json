@@ -1,0 +1,1938 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PhoneRisk API",
+    "version": "0.2.0",
+    "description": "Validates a phone number and says how risky it looks: validity, line type, carrier, country, local time, disposable-number detection and a 0-100 risk score with the reason behind every point. Answers come from numbering-plan data and public lists of disposable numbers; no request is made to the phone network, so the API cannot tell whether a number is in service."
+  },
+  "paths": {
+    "/api/v1/lookup": {
+      "post": {
+        "summary": "Look up one phone number",
+        "operationId": "lookup",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          },
+          {
+            "name": "nocache",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Nocache"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The input could not be read as a phone number"
+          }
+        }
+      },
+      "get": {
+        "summary": "Look up one phone number, with query parameters",
+        "description": "Same lookup with the number in the URL, handy for trying the API out.",
+        "operationId": "lookupByQuery",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          },
+          {
+            "name": "default_region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Default Region"
+            }
+          },
+          {
+            "name": "dial_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dial From"
+            }
+          },
+          {
+            "name": "at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "At"
+            }
+          },
+          {
+            "name": "number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "title": "Number"
+            }
+          },
+          {
+            "name": "nocache",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Nocache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The input could not be read as a phone number"
+          }
+        }
+      }
+    },
+    "/api/v1/lookup/batch": {
+      "post": {
+        "summary": "Look up several phone numbers",
+        "description": "Look up many numbers at once. Entries that are not phone numbers get a result instead of failing the batch.",
+        "operationId": "lookupBatch",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          },
+          {
+            "name": "nocache",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Nocache"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchLookupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchLookupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/extract": {
+      "post": {
+        "summary": "Find and look up every phone number in a text",
+        "description": "Find every valid phone number in a block of text and look each one up.",
+        "operationId": "extract",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          },
+          {
+            "name": "nocache",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Nocache"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compare": {
+      "post": {
+        "summary": "Tell whether two numbers are the same number",
+        "description": "Tell whether two differently written numbers are the same number.",
+        "operationId": "compare",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompareRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompareResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The input could not be read as a phone number"
+          }
+        }
+      }
+    },
+    "/api/v1/vanity": {
+      "get": {
+        "summary": "Turn the letters of a vanity number into digits",
+        "description": "Turn the letters of a vanity number (1-800-FLOWERS) into the digits to dial.",
+        "operationId": "vanity",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          },
+          {
+            "name": "number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "title": "Number"
+            }
+          },
+          {
+            "name": "default_region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Default Region"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VanityResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/examples/{country}": {
+      "get": {
+        "summary": "Example numbers of a country",
+        "description": "Example numbers of every line type a country has, for test suites and input placeholders.",
+        "operationId": "examples",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          },
+          {
+            "name": "country",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "title": "Country"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamplesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/short-number": {
+      "get": {
+        "summary": "Describe an emergency number or short code",
+        "description": "Describe an emergency number or short code (112, 911, 5-digit SMS codes) as dialled inside a country.",
+        "operationId": "shortNumber",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          },
+          {
+            "name": "number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16,
+              "title": "Number"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "title": "Country"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShortNumberResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The input could not be read as a phone number"
+          }
+        }
+      }
+    },
+    "/api/v1/numverify/validate": {
+      "get": {
+        "summary": "Validate a number in Numverify's response format",
+        "description": "Validate a number and answer in Numverify's response format.\n\nAs with Numverify, `number` is in international format (the \"+\" is\noptional) unless `country_code` says which country a national number\nbelongs to.",
+        "operationId": "numverifyValidate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RapidAPIHost"
+          },
+          {
+            "name": "number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "title": "Number"
+            }
+          },
+          {
+            "name": "country_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Country Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NumverifyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BatchLookupRequest": {
+        "properties": {
+          "default_region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Region"
+          },
+          "dial_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dial From"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "numbers": {
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "type": "array",
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Numbers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numbers"
+        ],
+        "title": "BatchLookupRequest"
+      },
+      "BatchLookupResponse": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/BatchLookupResult"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "results"
+        ],
+        "title": "BatchLookupResponse"
+      },
+      "BatchLookupResult": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "possible": {
+            "type": "boolean",
+            "title": "Possible",
+            "default": false
+          },
+          "invalid_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invalid Reason"
+          },
+          "e164": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "E164"
+          },
+          "national_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "National Format"
+          },
+          "international_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "International Format"
+          },
+          "rfc3966": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rfc3966"
+          },
+          "dial_from_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dial From Format"
+          },
+          "calling_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calling Code"
+          },
+          "national_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "National Number"
+          },
+          "country_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Name"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "carrier": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "line_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timezones": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "local_time": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocalTime"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_voip": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_disposable": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_reserved": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskAssessment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "valid",
+          "risk"
+        ],
+        "title": "BatchLookupResult"
+      },
+      "CallingWindow": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "rule": {
+            "type": "string",
+            "title": "Rule"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "rule"
+        ],
+        "title": "CallingWindow"
+      },
+      "CompareRequest": {
+        "properties": {
+          "first": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "First"
+          },
+          "second": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Second"
+          },
+          "default_region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Region"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first",
+          "second"
+        ],
+        "title": "CompareRequest"
+      },
+      "CompareResponse": {
+        "properties": {
+          "match_type": {
+            "type": "string",
+            "enum": [
+              "exact_match",
+              "nsn_match",
+              "short_nsn_match",
+              "no_match"
+            ],
+            "title": "Match Type"
+          },
+          "is_match": {
+            "type": "boolean",
+            "title": "Is Match"
+          },
+          "first_e164": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First E164"
+          },
+          "second_e164": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Second E164"
+          }
+        },
+        "type": "object",
+        "required": [
+          "match_type",
+          "is_match"
+        ],
+        "title": "CompareResponse"
+      },
+      "ExampleNumber": {
+        "properties": {
+          "e164": {
+            "type": "string",
+            "title": "E164"
+          },
+          "national": {
+            "type": "string",
+            "title": "National"
+          },
+          "international": {
+            "type": "string",
+            "title": "International"
+          }
+        },
+        "type": "object",
+        "required": [
+          "e164",
+          "national",
+          "international"
+        ],
+        "title": "ExampleNumber"
+      },
+      "ExamplesResponse": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "country_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Name"
+          },
+          "calling_code": {
+            "type": "integer",
+            "title": "Calling Code"
+          },
+          "examples": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ExampleNumber"
+            },
+            "type": "object",
+            "title": "Examples"
+          },
+          "invalid_example": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invalid Example"
+          }
+        },
+        "type": "object",
+        "required": [
+          "country",
+          "calling_code",
+          "examples"
+        ],
+        "title": "ExamplesResponse"
+      },
+      "ExtractMatch": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "possible": {
+            "type": "boolean",
+            "title": "Possible",
+            "default": false
+          },
+          "invalid_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invalid Reason"
+          },
+          "e164": {
+            "type": "string",
+            "title": "E164"
+          },
+          "national_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "National Format"
+          },
+          "international_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "International Format"
+          },
+          "rfc3966": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rfc3966"
+          },
+          "dial_from_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dial From Format"
+          },
+          "calling_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calling Code"
+          },
+          "national_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "National Number"
+          },
+          "country_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Name"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "carrier": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "line_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timezones": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "local_time": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocalTime"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_voip": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_disposable": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_reserved": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskAssessment"
+          },
+          "start": {
+            "type": "integer",
+            "title": "Start"
+          },
+          "end": {
+            "type": "integer",
+            "title": "End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "valid",
+          "e164",
+          "risk",
+          "start",
+          "end"
+        ],
+        "title": "ExtractMatch"
+      },
+      "ExtractRequest": {
+        "properties": {
+          "default_region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Region"
+          },
+          "dial_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dial From"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ExtractRequest"
+      },
+      "ExtractResponse": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated"
+          },
+          "matches": {
+            "items": {
+              "$ref": "#/components/schemas/ExtractMatch"
+            },
+            "type": "array",
+            "title": "Matches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "truncated",
+          "matches"
+        ],
+        "title": "ExtractResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IntelligenceSignal": {
+        "properties": {
+          "value": {
+            "title": "Value"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "confidence",
+          "source"
+        ],
+        "title": "IntelligenceSignal"
+      },
+      "LocalTime": {
+        "properties": {
+          "time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time"
+          },
+          "utc_offsets": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Utc Offsets"
+          },
+          "calling_window": {
+            "$ref": "#/components/schemas/CallingWindow"
+          },
+          "in_calling_window": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In Calling Window"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time",
+          "utc_offsets",
+          "calling_window",
+          "in_calling_window"
+        ],
+        "title": "LocalTime"
+      },
+      "LookupRequest": {
+        "properties": {
+          "default_region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Region"
+          },
+          "dial_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dial From"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "number": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Number"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number"
+        ],
+        "title": "LookupRequest"
+      },
+      "LookupResponse": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "possible": {
+            "type": "boolean",
+            "title": "Possible",
+            "default": false
+          },
+          "invalid_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invalid Reason"
+          },
+          "e164": {
+            "type": "string",
+            "title": "E164"
+          },
+          "national_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "National Format"
+          },
+          "international_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "International Format"
+          },
+          "rfc3966": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rfc3966"
+          },
+          "dial_from_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dial From Format"
+          },
+          "calling_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calling Code"
+          },
+          "national_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "National Number"
+          },
+          "country_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Name"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "carrier": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "line_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timezones": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "local_time": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocalTime"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_voip": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_disposable": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_reserved": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntelligenceSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskAssessment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "valid",
+          "e164",
+          "risk"
+        ],
+        "title": "LookupResponse"
+      },
+      "NumverifyResponse": {
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "local_format": {
+            "type": "string",
+            "title": "Local Format"
+          },
+          "international_format": {
+            "type": "string",
+            "title": "International Format"
+          },
+          "country_prefix": {
+            "type": "string",
+            "title": "Country Prefix"
+          },
+          "country_code": {
+            "type": "string",
+            "title": "Country Code"
+          },
+          "country_name": {
+            "type": "string",
+            "title": "Country Name"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "carrier": {
+            "type": "string",
+            "title": "Carrier"
+          },
+          "line_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "valid",
+          "number",
+          "local_format",
+          "international_format",
+          "country_prefix",
+          "country_code",
+          "country_name",
+          "location",
+          "carrier"
+        ],
+        "title": "NumverifyResponse",
+        "description": "Numverify's /validate response, field for field."
+      },
+      "RiskAssessment": {
+        "properties": {
+          "score": {
+            "type": "integer",
+            "title": "Score"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Level"
+          },
+          "recommendation": {
+            "type": "string",
+            "enum": [
+              "allow",
+              "review",
+              "block"
+            ],
+            "title": "Recommendation"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/RiskReason"
+            },
+            "type": "array",
+            "title": "Reasons"
+          }
+        },
+        "type": "object",
+        "required": [
+          "score",
+          "level",
+          "recommendation",
+          "reasons"
+        ],
+        "title": "RiskAssessment"
+      },
+      "RiskReason": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "weight": {
+            "type": "integer",
+            "title": "Weight"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "weight",
+          "description"
+        ],
+        "title": "RiskReason"
+      },
+      "ShortNumberResponse": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "possible": {
+            "type": "boolean",
+            "title": "Possible"
+          },
+          "is_emergency": {
+            "type": "boolean",
+            "title": "Is Emergency"
+          },
+          "connects_to_emergency": {
+            "type": "boolean",
+            "title": "Connects To Emergency"
+          },
+          "cost": {
+            "type": "string",
+            "enum": [
+              "toll_free",
+              "standard_rate",
+              "premium_rate",
+              "unknown"
+            ],
+            "title": "Cost"
+          },
+          "is_carrier_specific": {
+            "type": "boolean",
+            "title": "Is Carrier Specific"
+          },
+          "is_sms_service": {
+            "type": "boolean",
+            "title": "Is Sms Service"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "country",
+          "valid",
+          "possible",
+          "is_emergency",
+          "connects_to_emergency",
+          "cost",
+          "is_carrier_specific",
+          "is_sms_service"
+        ],
+        "title": "ShortNumberResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VanityResponse": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "digits": {
+            "type": "string",
+            "title": "Digits"
+          },
+          "e164": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "E164"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "digits"
+        ],
+        "title": "VanityResponse"
+      }
+    },
+    "securitySchemes": {
+      "RapidAPIKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-RapidAPI-Key",
+        "description": "Your RapidAPI key, shown on the listing once you are subscribed to a plan."
+      }
+    },
+    "parameters": {
+      "RapidAPIHost": {
+        "name": "X-RapidAPI-Host",
+        "in": "header",
+        "required": true,
+        "description": "Always phonerisk-api.p.rapidapi.com.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "phonerisk-api.p.rapidapi.com"
+          ]
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://phonerisk-api.p.rapidapi.com"
+    }
+  ],
+  "externalDocs": {
+    "description": "Plans, prices and API keys",
+    "url": "https://rapidapi.com/daimaileri20/api/phonerisk-api"
+  },
+  "security": [
+    {
+      "RapidAPIKey": []
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "phonerisk",
+  "version": "0.1.0",
+  "description": "Client for the PhoneRisk API: phone number validation, line type, carrier, disposable-number detection and a 0-100 risk score.",
+  "keywords": [
+    "phone",
+    "phone-number",
+    "phone-validation",
+    "validation",
+    "risk-score",
+    "fraud",
+    "disposable-phone-number",
+    "line-type",
+    "carrier",
+    "sms",
+    "libphonenumber",
+    "rapidapi"
+  ],
+  "license": "MIT",
+  "author": "Kreunt",
+  "homepage": "https://github.com/Kreunt/phonerisk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kreunt/phonerisk.git",
+    "directory": "js"
+  },
+  "bugs": "https://github.com/Kreunt/phonerisk/issues",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}
